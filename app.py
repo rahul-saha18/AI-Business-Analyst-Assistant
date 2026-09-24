@@ -8,7 +8,17 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 import os
-from google import genai
+try:
+    from google import genai
+    HAS_GENAI = True
+except ImportError:
+    try:
+        import google.generativeai as genai
+        HAS_GENAI = True
+    except ImportError:
+        genai = None
+        HAS_GENAI = False
+
 
 # ── Page setup ────────────────────────────────────────────────────────────
 st.set_page_config(page_title="AI Business Analyst Assistant", layout="wide")
@@ -201,7 +211,7 @@ def ask_business_question(question, model="gemini-2.0-flash", key=""):
     used_engine = "Gemini AI"
 
     # Step 1: Attempt Gemini API if key is available
-    if key:
+    if key and HAS_GENAI:
         try:
             client = genai.Client(api_key=key)
             prompt = build_sql_prompt(question)
